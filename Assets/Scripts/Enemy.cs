@@ -7,10 +7,13 @@ public class Enemy : MonoBehaviour
     private NavMeshAgent _agent;
     private Transform _playerTransform;
     private IEnemyState _currentState;
+    private GameManager _gameManager;
     [SerializeField] private List<Transform> waypoints;
     
     [SerializeField] private float detectionRange = 10f;
     [SerializeField] private float searchDuration = 5f;
+    [SerializeField] private float catchDistance = 1.5f;
+    [SerializeField] private Transform eyePoint;
 
     void Awake()
     {
@@ -23,6 +26,8 @@ public class Enemy : MonoBehaviour
         _playerTransform = player.transform;
         _currentState = new PatrolState(_agent, waypoints);
         _currentState.Enter();
+        
+        _gameManager = FindAnyObjectByType<GameManager>();
     }
 
     void Update()
@@ -41,6 +46,11 @@ public class Enemy : MonoBehaviour
             var searchState = new SearchState(_agent, _playerTransform.position, searchDuration);
             searchState.OnSearchComplete += HandleSearchComplete;
             SwitchState(searchState);
+        }
+
+        if ((_currentState is ChaseState) && Vector3.Distance(transform.position, _playerTransform.position) <= catchDistance)
+        {
+            _gameManager.PlayerCaught();
         }
             
         else if (!canSeePlayer && !(_currentState is PatrolState) && !(_currentState is SearchState))
@@ -62,14 +72,17 @@ public class Enemy : MonoBehaviour
 
         if (distanceToPlayer <= detectionRange)
         {
-            Vector3 directionToPlayer = (_playerTransform.position - transform.position).normalized;
-            Ray ray = new Ray(transform.position, directionToPlayer);
+            Vector3 rayOrigin = eyePoint.position;
+            Vector3 targetPoint = _playerTransform.position;
+            Vector3 directionToPlayer = (targetPoint - rayOrigin).normalized;
+
+            Ray ray = new Ray(rayOrigin, directionToPlayer);
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, detectionRange))
             {
                 if (hit.collider.gameObject == _playerTransform.gameObject)
                 {
-                    Debug.DrawLine(transform.position, hit.point, Color.red, 5f);
+                    Debug.DrawLine(rayOrigin, hit.point, Color.green);
                     return true;
                 }
             }

@@ -73,12 +73,6 @@ public class PlayerCharacter : MonoBehaviour
             if (interactable != null)
             {
                 interactable.OnInteract();
-                Debug.DrawLine(cameraTransform.position, hit.point, Color.green, 5f);
-            }
-
-            else
-            {
-                Debug.DrawLine(cameraTransform.position, hit.point, Color.red, 5f);
             }
         }
     }

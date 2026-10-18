@@ -23,7 +23,7 @@ public class PatrolState : IEnemyState
 
     public void Tick()
     {
-        if (_agent.remainingDistance <= 0.5f)
+        if (_agent.remainingDistance <= 1.5f)
         {
             _currentWaypointIndex = (_currentWaypointIndex + 1) % _waypoints.Count;
             _agent.SetDestination(_waypoints[_currentWaypointIndex].position);

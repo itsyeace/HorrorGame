@@ -3,6 +3,7 @@ using UnityEngine;
 public class Door : MonoBehaviour, IInteractable
 {
     [SerializeField] private ItemData requiredItemData;
+    [SerializeField] private float angle;
     
     private Inventory _playerInventory;
 
@@ -16,7 +17,7 @@ public class Door : MonoBehaviour, IInteractable
         if (_playerInventory.HasItem(requiredItemData))
         {
             Debug.Log("Door Open");
-            GetComponent<Collider>().enabled = false;
+            transform.Rotate(Vector3.up, angle, Space.World);
         }
 
         else
